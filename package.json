@@ -1,0 +1,33 @@
+{
+  "name": "imicros-accounts",
+  "version": "0.0.1",
+  "author": "Andreas Leinen <andreas.leinen@imicros.de> (www.imicros.de)",
+  "license": "MIT",
+  "description": "Moleculer Service for imicros Accounting",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --coverage --no-cache",
+    "test-local": "jest --coverage --no-cache --config=local.js",
+    "test-db": "jest test/db.neo4j.spec.js --no-cache --config=local.js",
+    "test-accounts": "jest test/accounts.spec.js --no-cache --config=local.js"
+  },
+  "keywords": [
+    "Moleculer",
+    "imicros",
+    "accounts"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/al66/imicros-accounts.git"
+  },
+  "dependencies": {
+    "imicros-acl": "0.0.3",
+    "neo4j-driver": "^1.7.5",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "coveralls": "^3.0.4",
+    "jest": "^24.8.0",
+    "moleculer": "^0.13.9"
+  }
+}
