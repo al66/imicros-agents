@@ -4,5 +4,5 @@
 "use strict";
 
 module.exports = {
-    Accounts: require("./lib/accounts")
+    Agents: require("./lib/agents")
 };

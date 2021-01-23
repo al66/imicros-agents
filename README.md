@@ -1,2 +1,2 @@
-# imicros-accounts
-Moleculer service for imicros accounting
+# imicros-agents
+Moleculer service for imicros agents

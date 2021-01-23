@@ -1,7 +1,7 @@
 "use strict";
 
 const { ServiceBroker } = require("moleculer");
-const { Accounts } = require("../index");
+const { Agents } = require("../index");
 const { SecretsMixin } = require("imicros-minio");
 const fs = require("fs");
 
@@ -35,7 +35,7 @@ describe("Test group service", () => {
                 logger: console,
                 logLevel: "info" //"debug"
             });
-            service = broker.createService(Accounts, Object.assign({ 
+            service = broker.createService(Agents, Object.assign({ 
                 mixins: [SecretsMixin({ service: "keys" })],
                 dependencies: ["keys"],
                 settings: { 
@@ -54,7 +54,7 @@ describe("Test group service", () => {
 
     describe("Test account service", () => {
     
-        let opts, accounts = [], token = [], credentials;
+        let opts, services = [], token = [], credentials;
         
         beforeEach(() => {
             opts = { };
@@ -65,37 +65,37 @@ describe("Test group service", () => {
             let params = {
                 label: "my first account"
             };
-            return broker.call("account.create", params, opts).then(res => {
+            return broker.call("agents.create", params, opts).then(res => {
                 expect(res).toBeDefined();
                 expect(res).toEqual(expect.objectContaining({
-                    accountId: expect.any(String)
+                    serviceId: expect.any(String)
                 }));
-                accounts.push(res);
+                services.push(res);
             });
         });
 
         it("it should get the account", async () => {
             let params = {
-                accountId: accounts[0].accountId
+                serviceId: services[0].serviceId
             };
-            return broker.call("account.get", params, opts).then(res => {
+            return broker.call("agents.get", params, opts).then(res => {
                 expect(res).toBeDefined();
                 expect(res).toEqual(expect.objectContaining({
-                    accountId: expect.any(String),
+                    serviceId: expect.any(String),
                     label: "my first account",
                     token: []
                 }));
             });
         });
 
-        it("it should get all accounts", async () => {
+        it("it should get all services", async () => {
             let params = {
             };
-            return broker.call("account.getAll", params, opts).then(res => {
+            return broker.call("agents.getAll", params, opts).then(res => {
                 expect(res).toBeDefined();
                 expect(res.length).toEqual(1);
                 expect(res).toContainEqual(expect.objectContaining({
-                    accountId: expect.any(String),
+                    serviceId: expect.any(String),
                     label: "my first account",
                     token: []
                 }));
@@ -104,9 +104,9 @@ describe("Test group service", () => {
 
         it("it should generate an authToken", async () => {
             let params = {
-                accountId: accounts[0].accountId
+                serviceId: services[0].serviceId
             };
-            return broker.call("account.generateAuthToken", params, opts).then(res => {
+            return broker.call("agents.generateAuthToken", params, opts).then(res => {
                 expect(res).toBeDefined();
                 // { tokenId, created, expire, authToken }
                 expect(res).toEqual(expect.objectContaining({
@@ -121,10 +121,10 @@ describe("Test group service", () => {
 
         it("it should get the authToken", async () => {
             let params = {
-                accountId: accounts[0].accountId,
+                serviceId: services[0].serviceId,
                 tokenId: token[0].tokenId
             };
-            return broker.call("account.getAuthToken", params, opts).then(res => {
+            return broker.call("agents.getAuthToken", params, opts).then(res => {
                 expect(res).toBeDefined();
                 // { tokenId, created, expire, authToken }
                 expect(res).toEqual(expect.objectContaining({
@@ -138,9 +138,9 @@ describe("Test group service", () => {
 
         it("it should generate a second authToken", async () => {
             let params = {
-                accountId: accounts[0].accountId
+                serviceId: services[0].serviceId
             };
-            return broker.call("account.generateAuthToken", params, opts).then(res => {
+            return broker.call("agents.generateAuthToken", params, opts).then(res => {
                 expect(res).toBeDefined();
                 // { tokenId, created, expire, authToken }
                 expect(res).toEqual(expect.objectContaining({
@@ -155,12 +155,12 @@ describe("Test group service", () => {
         
         it("it should get the account with token", async () => {
             let params = {
-                accountId: accounts[0].accountId
+                serviceId: services[0].serviceId
             };
-            return broker.call("account.get", params, opts).then(res => {
+            return broker.call("agents.get", params, opts).then(res => {
                 expect(res).toBeDefined();
                 expect(res).toEqual(expect.objectContaining({
-                    accountId: expect.any(String),
+                    serviceId: expect.any(String),
                     label: "my first account",
                     token: expect.any(Array)
                 }));
@@ -178,13 +178,13 @@ describe("Test group service", () => {
         });
 
 
-        it("it should get all accounts", async () => {
+        it("it should get all services", async () => {
             let params = {
             };
-            return broker.call("account.getAll", params, opts).then(res => {
+            return broker.call("agents.getAll", params, opts).then(res => {
                 expect(res).toBeDefined();
                 expect(res).toContainEqual(expect.objectContaining({
-                    accountId: expect.any(String),
+                    serviceId: expect.any(String),
                     label: "my first account",
                     token: expect.any(Array)
                 }));
@@ -203,10 +203,10 @@ describe("Test group service", () => {
 
         it("it should login", async () => {
             let params = {
-                accountId: accounts[0].accountId,
+                serviceId: services[0].serviceId,
                 authToken: token[0].authToken
             };
-            return broker.call("account.login", params, opts).then(res => {
+            return broker.call("agents.login", params, opts).then(res => {
                 expect(res).toBeDefined();
                 expect(res).toEqual(expect.objectContaining({
                     sessionToken: expect.any(String),
@@ -221,11 +221,11 @@ describe("Test group service", () => {
             let params = {
                 sessionToken: credentials.sessionToken
             };
-            return broker.call("account.verify", params, opts).then(res => {
+            return broker.call("agents.verify", params, opts).then(res => {
                 expect(res).toBeDefined();
                 console.log(res);
                 expect(res).toEqual(expect.objectContaining({
-                    accountId: accounts[0].accountId,
+                    serviceId: services[0].serviceId,
                     label: "my first account",
                     ownerId: ownerId
                 }));
@@ -234,10 +234,10 @@ describe("Test group service", () => {
         
         it("it should delete the authToken", async () => {
             let params = {
-                accountId: accounts[0].accountId,
+                serviceId: services[0].serviceId,
                 tokenId: token[0].tokenId
             };
-            return broker.call("account.removeAuthToken", params, opts).then(res => {
+            return broker.call("agents.removeAuthToken", params, opts).then(res => {
                 expect(res).toBeDefined();
                 expect(res).toEqual(true);
             });
@@ -245,9 +245,9 @@ describe("Test group service", () => {
 
         it("it should delete an account", async () => {
             let params = {
-                accountId: accounts[0].accountId
+                serviceId: services[0].serviceId
             };
-            return broker.call("account.delete", params, opts).then(res => {
+            return broker.call("agents.delete", params, opts).then(res => {
                 expect(res).toBeDefined();
                 expect(res).toEqual(true);
             });
