@@ -11,6 +11,7 @@ class User {
 }
 
 const accessToken = "this is the access token";
+const grantToken = "this is the grant token";
 const user = new User();
 const ownerId = uuid();
 const meta = {
@@ -44,8 +45,16 @@ const ACLMiddleware = {
 
 // mock service acl
 const ACL = {
+    // name: "v1.acl",
     name: "acl",
     actions: {
+        grantAccess: {
+            async handler({ meta: { ownerId, service: { serviceId }}}) {
+                this.logger.info("acl.grantAccess called", { ownerId, serviceId } );
+                if (ownerId === meta.ownerId && serviceId) return { token: grantToken }; 
+                return false;
+            }
+        },
         requestAccess: {
             params: {
                 forGroupId: { type: "string" }

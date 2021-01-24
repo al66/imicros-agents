@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "author": "Andreas Leinen <andreas.leinen@imicros.de> (www.imicros.de)",
   "license": "MIT",
-  "description": "Moleculer Service for imicros agents",
+  "description": "Moleculer service for imicros agents",
   "main": "index.js",
   "scripts": {
     "test": "jest --coverage --no-cache",
@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "coveralls": "^3.1.0",
+    "eslint": "^7.18.0",
     "jest": "^26.6.3",
     "moleculer": "^0.14.12",
     "nats": "^1.4.12"

@@ -20,7 +20,8 @@ afterAll( async () => {
 
 describe("Test group service", () => {
 
-    let broker, service;
+    let broker, service, services = [], token = [];
+    
     beforeAll( async () => {
     });
 
@@ -41,7 +42,10 @@ describe("Test group service", () => {
                 settings: { 
                     uri: process.env.URI || "bolt://localhost:7687",
                     user: "neo4j",
-                    password: "neo4j"
+                    password: "neo4j",
+                    services: {
+                        // acl: "v1.acl"
+                    }
                 } 
             }));
             // Start additional services
@@ -52,18 +56,18 @@ describe("Test group service", () => {
 
     });
 
-    describe("Test account service", () => {
+    describe("Test agents  - part I", () => {
     
-        let opts, services = [], token = [], credentials;
+        let opts;
         
         beforeEach(() => {
             opts = { };
         });
         
-        
         it("it should add an account", async () => {
             let params = {
-                label: "my first account"
+                label: "my first account",
+                role: "member"
             };
             return broker.call("agents.create", params, opts).then(res => {
                 expect(res).toBeDefined();
@@ -186,6 +190,7 @@ describe("Test group service", () => {
                 expect(res).toContainEqual(expect.objectContaining({
                     serviceId: expect.any(String),
                     label: "my first account",
+                    role: "member",
                     token: expect.any(Array)
                 }));
                 expect(res[0].token).toContainEqual(expect.objectContaining({
@@ -201,6 +206,17 @@ describe("Test group service", () => {
             });
         });
 
+    });
+        
+    describe("Test login", () => {
+    
+        let opts, credentials;
+        
+        beforeEach(() => {
+            opts = { };
+        });
+
+        
         it("it should login", async () => {
             let params = {
                 serviceId: services[0].serviceId,
@@ -209,7 +225,7 @@ describe("Test group service", () => {
             return broker.call("agents.login", params, opts).then(res => {
                 expect(res).toBeDefined();
                 expect(res).toEqual(expect.objectContaining({
-                    sessionToken: expect.any(String),
+                    serviceToken: expect.any(String),
                     accessToken: expect.any(String)
                 }));
                 credentials = res;
@@ -219,7 +235,7 @@ describe("Test group service", () => {
         
         it("it should verify session token", async () => {
             let params = {
-                sessionToken: credentials.sessionToken
+                serviceToken: credentials.serviceToken
             };
             return broker.call("agents.verify", params, opts).then(res => {
                 expect(res).toBeDefined();
@@ -230,6 +246,16 @@ describe("Test group service", () => {
                     ownerId: ownerId
                 }));
             });
+        });
+
+    });
+        
+    describe("Test agents - part II", () => {
+        
+        let opts;
+        
+        beforeEach(() => {
+            opts = { };
         });
         
         it("it should delete the authToken", async () => {
