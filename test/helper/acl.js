@@ -10,33 +10,30 @@ class User {
     }
 }
 
-const accessToken = "this is the access token";
-const grantToken = "this is the grant token";
+const Token = {
+    accessToken: "this is the access token",
+    grantToken: "this is the grant token"
+};
 const user = new User();
 const ownerId = uuid();
 const meta = {
     ownerId: ownerId,
     acl: {
-        accessToken: accessToken,
+        accessToken: Token.accessToken,
         ownerId: ownerId
     }, 
     user: user
 }; 
-const serviceToken = process.env.SERVICE_TOKEN;
 
 // mock acl middelware
 const ACLMiddleware = {
     localAction(next, action) {
         return async function(ctx) {
-            ctx.meta = Object.assign(ctx.meta,{
-                ownerId: ownerId,
-                acl: {
-                    accessToken: accessToken,
-                    ownerId: ownerId,
-                    unrestricted: true
-                }, 
-                user: user
-            });
+            delete ctx.meta.ownerId;
+            if (ctx.meta && ctx.meta.acl) {
+                ctx.meta.acl.accessToken ? ctx.meta.ownerId = ctx.meta.acl.ownerId : ctx.meta.acl = {};
+            }
+            if (ctx.meta && ctx.meta.service && !ctx.meta.service.serviceToken) ctx.meta.service = {};
             ctx.broker.logger.debug("ACL meta data has been set", { meta: ctx.meta, action: action });
             return next(ctx);
         };
@@ -49,47 +46,36 @@ const ACL = {
     name: "acl",
     actions: {
         grantAccess: {
-            async handler({ meta: { ownerId, service: { serviceId }}}) {
-                this.logger.info("acl.grantAccess called", { ownerId, serviceId } );
-                if (ownerId === meta.ownerId && serviceId) return { token: grantToken }; 
+            async handler({ meta: { acl: { accessToken }, service: { serviceToken }}}) {
+                this.logger.info("acl.grantAccess called", { accessToken, serviceToken } );
+                if (accessToken === Token.accessToken && serviceToken) {
+                    this.logger.info("acl.grantAccess returned", { token: Token.grantToken } );
+                    return { token: Token.grantToken }; 
+                }
                 return false;
             }
         },
-        requestAccess: {
-            params: {
-                forGroupId: { type: "string" }
-            },			
-            async handler(ctx) {
-                this.logger.info("acl.requestAccess called", { params: ctx.params, meta: ctx.meta } );
-                if (ctx.meta.user === meta.user && ctx.meta.ownerId === meta.ownerId && ctx.meta.serviceToken === serviceToken) return { token: accessToken }; 
-                return false;
-            }
-        },
-        verify: {
+        exchangeToken: {
             params: {
                 token: { type: "string" }
             },
-            async handler(ctx) {
-                this.logger.info("acl.verified called", { params: ctx.params, meta: ctx.meta } );
-                return { 
-                    acl: {
-                        accessToken: ctx.params.token,
-                        ownerId: ctx.meta.ownerId,
-                        role: "admin",
-                        unrestricted: true
-                    } 
-                };
-            }
+            async handler({ params: { token }, meta: { service: { serviceToken }}}) {
+                this.logger.info("acl.exchangeToken called", { token, serviceToken } );
+                if (serviceToken ) {
+                    this.logger.info("acl.exchangeToken returned", { token: Token.accessToken } );
+                    return { token: Token.accessToken }; 
+                }
+                return false;
+            },
         }
     }
 };
 
 module.exports = {
-    user: user,
-    ownerId: ownerId,
-    meta: meta,
-    accessToken: accessToken,
-    serviceToken: serviceToken,
-    ACL: ACL,
+    user,
+    ownerId,
+    meta,
+    accessToken: Token.accessToken,
+    ACL,
     ACLMiddleware
 };

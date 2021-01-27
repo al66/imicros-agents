@@ -61,7 +61,7 @@ describe("Test group service", () => {
         let opts;
         
         beforeEach(() => {
-            opts = { };
+            opts = { meta };
         });
         
         it("it should add an account", async () => {
@@ -213,7 +213,7 @@ describe("Test group service", () => {
         let opts, credentials;
         
         beforeEach(() => {
-            opts = { };
+            opts = { meta };
         });
 
         
@@ -229,7 +229,7 @@ describe("Test group service", () => {
                     accessToken: expect.any(String)
                 }));
                 credentials = res;
-                console.log(res);
+                // console.log(res);
             });
         });
         
@@ -239,7 +239,7 @@ describe("Test group service", () => {
             };
             return broker.call("agents.verify", params, opts).then(res => {
                 expect(res).toBeDefined();
-                console.log(res);
+                // console.log(res);
                 expect(res).toEqual(expect.objectContaining({
                     serviceId: services[0].serviceId,
                     label: "my first account",
@@ -248,6 +248,35 @@ describe("Test group service", () => {
             });
         });
 
+        it("it should grant access", async () => {
+            let opts = {
+                meta
+            };
+            opts.meta.service = {
+                serviceToken: credentials.serviceToken
+            };
+            let params = {};
+            return broker.call("agents.grantAccess", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toEqual(true);
+            });
+        });
+        
+        it("it should retrieve access token", async () => {
+            let opts = {
+                meta: {
+                    service: {
+                        serviceToken: credentials.serviceToken
+                    }
+                }
+            };
+            let params =  { ownerId: meta.ownerId };
+            return broker.call("agents.requestAccess", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res.token).toBeDefined();
+            });
+        });
+        
     });
         
     describe("Test agents - part II", () => {
@@ -255,7 +284,7 @@ describe("Test group service", () => {
         let opts;
         
         beforeEach(() => {
-            opts = { };
+            opts = { meta };
         });
         
         it("it should delete the authToken", async () => {

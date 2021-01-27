@@ -6,8 +6,8 @@
   "description": "Moleculer service for imicros agents",
   "main": "index.js",
   "scripts": {
-    "test": "jest --coverage --no-cache",
-    "test-local": "jest --coverage --no-cache --config=local.js",
+    "test": "jest --silent --coverage --no-cache",
+    "test-local": "jest --silent --coverage --no-cache --config=local.js",
     "test-db": "jest test/db.neo4j.spec.js --no-cache --config=local.js",
     "test-agents": "jest test/agents.spec.js --no-cache --config=local.js"
   },
