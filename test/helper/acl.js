@@ -29,12 +29,18 @@ const meta = {
 const ACLMiddleware = {
     localAction(next, action) {
         return async function(ctx) {
-            delete ctx.meta.ownerId;
-            if (ctx.meta && ctx.meta.acl) {
-                ctx.meta.acl.accessToken ? ctx.meta.ownerId = ctx.meta.acl.ownerId : ctx.meta.acl = {};
+            ctx.broker.logger.info("acl.middleware called", { meta: ctx.meta } );
+            if (ctx.meta && ctx.meta.acl && ctx.meta.acl.accessToken === Token.accessToken) {
+                ctx.meta.ownerId = ownerId;
+                ctx.meta.acl = meta.acl;
+            } else {
+                delete ctx.meta.ownerId;
+                ctx.meta.acl = {};
             }
-            if (ctx.meta && ctx.meta.service && !ctx.meta.service.serviceToken) ctx.meta.service = {};
-            ctx.broker.logger.debug("ACL meta data has been set", { meta: ctx.meta, action: action });
+            if (ctx.meta && ctx.meta.service && !ctx.meta.service.serviceToken) {
+                ctx.meta.service = {};
+            }
+            ctx.broker.logger.info("ACL meta data has been set", { meta: ctx.meta, action: action.name });
             return next(ctx);
         };
     }    
@@ -46,9 +52,9 @@ const ACL = {
     name: "acl",
     actions: {
         grantAccess: {
-            async handler({ meta: { acl: { accessToken }, service: { serviceToken }}}) {
-                this.logger.info("acl.grantAccess called", { accessToken, serviceToken } );
-                if (accessToken === Token.accessToken && serviceToken) {
+            async handler({ meta: { acl: { ownerId = null }, service: { serviceToken = null }}}) {
+                this.logger.info("acl.grantAccess called", { ownerId, serviceToken } );
+                if (ownerId === meta.ownerId && serviceToken) {
                     this.logger.info("acl.grantAccess returned", { token: Token.grantToken } );
                     return { token: Token.grantToken }; 
                 }
