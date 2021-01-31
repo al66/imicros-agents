@@ -54,6 +54,8 @@ const ACL = {
         grantAccess: {
             async handler({ meta: { acl: { ownerId = null }, service: { serviceToken = null }}}) {
                 this.logger.info("acl.grantAccess called", { ownerId, serviceToken } );
+                let result = await this.broker.call("agents.verify", { serviceToken });
+                this.logger.info("result agents.verify", { result });
                 if (ownerId === meta.ownerId && serviceToken) {
                     this.logger.info("acl.grantAccess returned", { token: Token.grantToken } );
                     return { token: Token.grantToken }; 

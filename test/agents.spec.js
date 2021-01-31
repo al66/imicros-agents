@@ -239,8 +239,9 @@ describe("Test group service", () => {
             };
             return broker.call("agents.verify", params, opts).then(res => {
                 expect(res).toBeDefined();
+                expect(res.service).toBeDefined();
                 // console.log(res);
-                expect(res).toEqual(expect.objectContaining({
+                expect(res.service).toEqual(expect.objectContaining({
                     serviceId: services[0].serviceId,
                     label: "my first account",
                     ownerId: ownerId
