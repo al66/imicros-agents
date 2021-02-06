@@ -323,6 +323,15 @@ describe("Test group service", () => {
             });
         });
 
+        it("it should return empty array", async () => {
+            let params = {
+            };
+            return broker.call("agents.getAll", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toEqual([]);
+            });
+        });
+
     });
     
     describe("Test stop broker", () => {
