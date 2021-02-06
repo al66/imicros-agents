@@ -66,7 +66,7 @@ describe("Test group service", () => {
         
         it("it should add an account", async () => {
             let params = {
-                label: "my first account",
+                label: "my first account - initial",
                 role: "member"
             };
             return broker.call("agents.create", params, opts).then(res => {
@@ -75,6 +75,20 @@ describe("Test group service", () => {
                     serviceId: expect.any(String)
                 }));
                 services.push(res);
+            });
+        });
+
+        it("it should rename an account", async () => {
+            let params = {
+                serviceId: services[0].serviceId,
+                label: "my first account"
+            };
+            return broker.call("agents.rename", params, opts).then(res => {
+                expect(res).toBeDefined();
+                expect(res).toEqual(expect.objectContaining({
+                    serviceId: params.serviceId,
+                    label: params.label
+                }));
             });
         });
 
