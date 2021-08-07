@@ -40,8 +40,8 @@ describe("Test db.neo4j", () => {
         await broker.start();
     });
 
-    afterAll(async (done) => {
-        await broker.stop().then(() => done());
+    afterAll(async () => {
+        await broker.stop();
     });
     
     it("service should be created", () => {
