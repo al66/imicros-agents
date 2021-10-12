@@ -2,7 +2,7 @@
 
 const { ServiceBroker } = require("moleculer");
 const { Agents } = require("../index");
-const { SecretsMixin } = require("imicros-minio");
+// const { SecretsMixin } = require("imicros-minio");
 const fs = require("fs");
 
 // helper & mocks
@@ -10,7 +10,7 @@ const { ACL, ACLMiddleware, meta, ownerId } = require("./helper/acl");
 const { Keys } = require("./helper/keys");
 
 //const timestamp = Date.now();
-process.env.JWT_SECRET = fs.readFileSync("dev/private.pem");
+process.env.AGENTS_JWT_SECRET = fs.readFileSync("dev/private.pem");
 
 beforeAll( async () => {
 });
@@ -37,12 +37,9 @@ describe("Test group service", () => {
                 logLevel: "info" //"debug"
             });
             service = broker.createService(Agents, Object.assign({ 
-                mixins: [SecretsMixin({ service: "keys" })],
+                // mixins: [SecretsMixin({ service: "keys" })],
                 dependencies: ["keys"],
                 settings: { 
-                    uri: process.env.URI || "bolt://localhost:7687",
-                    user: "neo4j",
-                    password: "neo4j",
                     services: {
                         // acl: "v1.acl"
                     }
