@@ -1,6 +1,6 @@
 {
   "name": "imicros-agents",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Andreas Leinen <andreas.leinen@imicros.de> (www.imicros.de)",
   "license": "MIT",
   "description": "Moleculer service for imicros agents",
@@ -22,13 +22,13 @@
   },
   "dependencies": {
     "jsonwebtoken": "^8.5.1",
-    "neo4j-driver": "^4.3.3",
+    "neo4j-driver": "^4.4.1",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
     "coveralls": "^3.1.1",
-    "eslint": "^8.0.0",
-    "jest": "^27.2.5",
-    "moleculer": "^0.14.17"
+    "eslint": "^8.4.0",
+    "jest": "^27.4.3",
+    "moleculer": "^0.14.18"
   }
 }
