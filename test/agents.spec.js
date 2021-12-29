@@ -10,7 +10,7 @@ const { ACL, ACLMiddleware, meta, ownerId } = require("./helper/acl");
 const { Keys } = require("./helper/keys");
 
 //const timestamp = Date.now();
-process.env.AGENTS_JWT_SECRET = fs.readFileSync("dev/private.pem");
+process.env.JWT_SECRET = fs.readFileSync("dev/private.pem");
 
 beforeAll( async () => {
 });
